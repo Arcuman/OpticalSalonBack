@@ -10,6 +10,9 @@ export class ValidationPipe implements PipeTransform<any> {
     if (metadata.type === 'param') {
       obj = { obj };
     }
+    if (metadata.type === 'query') {
+      return value;
+    }
     const errors = await validate(obj);
     if (errors.length) {
       const messages = errors.map((err) => {
