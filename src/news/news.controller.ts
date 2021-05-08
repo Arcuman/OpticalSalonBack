@@ -30,16 +30,16 @@ import { Role } from '../roles/enums/role.enum';
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
-  @Post()
-  @UseGuards(JwtAuthGuard)
   @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'Add new news',
     type: CreateNewsDto,
   })
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  @Post()
   create(@UploadedFile() image, @Body() createNewsDto: CreateNewsDto) {
     console.log(image);
     console.log(createNewsDto);
