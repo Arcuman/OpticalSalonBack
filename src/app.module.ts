@@ -29,6 +29,8 @@ import { News } from './news/news.model';
       database: process.env.MSSQL_DATABASE,
       models: [User, Role, UserRoles, News],
       autoLoadModels: true,
+      synchronize: true,
+      sync: { force: true },
     }),
     UsersModule,
     RolesModule,
@@ -38,8 +40,4 @@ import { News } from './news/news.model';
   controllers: [],
   providers: [],
 })
-export class AppModule {
-  constructor(private sequelize: Sequelize) {
-    this.sequelize.sync({ alter: true });
-  }
-}
+export class AppModule {}
