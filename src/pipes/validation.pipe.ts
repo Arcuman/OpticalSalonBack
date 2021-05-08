@@ -13,7 +13,9 @@ export class ValidationPipe implements PipeTransform<any> {
     if (metadata.type === 'query') {
       return value;
     }
-    const errors = await validate(obj);
+    console.log('ValidationPipe');
+    console.log(obj);
+    const errors = await validate(obj, {});
     if (errors.length) {
       const messages = errors.map((err) => {
         return `${err.property} - ${Object.values(err.constraints).join(', ')}`;

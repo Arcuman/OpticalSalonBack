@@ -12,6 +12,12 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { Sequelize } from 'sequelize-typescript';
 import { NewsModule } from './news/news.module';
 import { News } from './news/news.model';
+import { ProductModule } from './product/product.module';
+import { Product } from './product/product.model';
+import { SalonModule } from './salon/salon.module';
+import { Salon } from './salon/salon.model';
+import { ConsultationModule } from './salon/consultation/consultation.module';
+import { Consultation } from './salon/consultation/consultation.model';
 
 @Module({
   imports: [
@@ -28,12 +34,15 @@ import { News } from './news/news.model';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRESS_PASSWORD,
       database: process.env.POSTGRES_DB,
-      models: [User, Role, UserRoles, News],
+      models: [User, Role, UserRoles, News, Product, Salon, Consultation],
     }),
     UsersModule,
     RolesModule,
     AuthModule,
     NewsModule,
+    ProductModule,
+    SalonModule,
+    ConsultationModule,
   ],
   controllers: [],
   providers: [],
