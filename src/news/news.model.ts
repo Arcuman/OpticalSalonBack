@@ -16,7 +16,7 @@ interface NewsCreationAttrs {
   date: Date;
 }
 
-@Table({ tableName: 'users' })
+@Table({ tableName: 'news' })
 export class News extends Model<News, NewsCreationAttrs> {
   @ApiProperty({ example: '1', description: 'Уникальный идентификатор' })
   @Column({

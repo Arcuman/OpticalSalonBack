@@ -22,15 +22,13 @@ import { News } from './news/news.model';
       rootPath: path.resolve(__dirname, 'static'),
     }),
     SequelizeModule.forRoot({
-      dialect: 'mssql',
-      host: process.env.MSSQL_HOST,
-      username: process.env.MSSQL_USER,
-      password: process.env.MSSQL_PASSWORD,
-      database: process.env.MSSQL_DATABASE,
+      dialect: 'postgres',
+      host: process.env.POSTGRES_HOST,
+      port: Number(process.env.POSTGRESS_PORT),
+      username: process.env.POSTGRES_USER,
+      password: process.env.POSTGRESS_PASSWORD,
+      database: process.env.POSTGRES_DB,
       models: [User, Role, UserRoles, News],
-      autoLoadModels: true,
-      synchronize: true,
-      sync: { force: true },
     }),
     UsersModule,
     RolesModule,
@@ -40,4 +38,8 @@ import { News } from './news/news.model';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private sequelize: Sequelize) {
+    this.sequelize.sync({ alter: true });
+  }
+}

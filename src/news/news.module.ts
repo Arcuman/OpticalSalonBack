@@ -9,5 +9,6 @@ import { FilesService } from '../files/files.service';
   controllers: [NewsController],
   providers: [NewsService, FilesService],
   imports: [SequelizeModule.forFeature([News])],
+  exports: [NewsService],
 })
 export class NewsModule {}
