@@ -22,7 +22,7 @@ import { ConsultationService } from '../salon/consultation/consultation.service'
 export class UsersController {
   constructor(
     private usersService: UsersService,
-    private counsultationService: ConsultationService,
+    private consultationService: ConsultationService,
   ) {}
 
   @ApiOperation({ summary: 'Получить всех пользователей' })
@@ -52,6 +52,6 @@ export class UsersController {
     console.log('here');
     console.log(req.user);
     const user = req.user as { userId: number };
-    return this.counsultationService.findConsultationsByUserId(user);
+    return this.consultationService.findConsultationsByUserId(user);
   }
 }

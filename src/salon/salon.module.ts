@@ -9,6 +9,9 @@ import { ConsultationModule } from './consultation/consultation.module';
 @Module({
   controllers: [SalonController],
   providers: [SalonService],
-  imports: [SequelizeModule.forFeature([Salon, Consultation])],
+  imports: [
+    SequelizeModule.forFeature([Salon, Consultation]),
+    ConsultationModule,
+  ],
 })
 export class SalonModule {}
