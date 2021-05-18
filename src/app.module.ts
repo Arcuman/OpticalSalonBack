@@ -18,6 +18,7 @@ import { SalonModule } from './salon/salon.module';
 import { Salon } from './salon/salon.model';
 import { ConsultationModule } from './salon/consultation/consultation.module';
 import { Consultation } from './salon/consultation/consultation.model';
+import { FavoriteNews } from './news/favoriteNews.model';
 
 @Module({
   imports: [
@@ -34,7 +35,16 @@ import { Consultation } from './salon/consultation/consultation.model';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRESS_PASSWORD,
       database: process.env.POSTGRES_DB,
-      models: [User, Role, UserRoles, News, Product, Salon, Consultation],
+      models: [
+        User,
+        Role,
+        UserRoles,
+        News,
+        Product,
+        Salon,
+        Consultation,
+        FavoriteNews,
+      ],
     }),
     UsersModule,
     RolesModule,

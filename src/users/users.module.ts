@@ -10,13 +10,24 @@ import { RolesModule } from '../roles/roles.module';
 import { Consultation } from '../salon/consultation/consultation.model';
 import { ConsultationService } from '../salon/consultation/consultation.service';
 import { ConsultationModule } from '../salon/consultation/consultation.module';
+import { News } from '../news/news.model';
+import { FavoriteNews } from '../news/favoriteNews.model';
+import { NewsModule } from '../news/news.module';
 
 @Module({
   controllers: [UsersController],
   providers: [UsersService],
   imports: [
-    SequelizeModule.forFeature([User, Role, UserRoles, Consultation]),
+    SequelizeModule.forFeature([
+      User,
+      Role,
+      UserRoles,
+      Consultation,
+      News,
+      FavoriteNews,
+    ]),
     RolesModule,
+    NewsModule,
     ConsultationModule,
     forwardRef(() => AuthModule),
   ],

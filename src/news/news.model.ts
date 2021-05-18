@@ -8,6 +8,8 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '../roles/roles.model';
 import { UserRoles } from '../roles/user-roles.model';
+import { User } from '../users/users.model';
+import { FavoriteNews } from './favoriteNews.model';
 
 interface NewsCreationAttrs {
   title: string;
@@ -51,4 +53,7 @@ export class News extends Model<News, NewsCreationAttrs> {
   })
   @Column({ type: DataType.DATE, allowNull: false })
   date: Date;
+
+  @BelongsToMany(() => User, () => FavoriteNews)
+  users: User[];
 }

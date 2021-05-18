@@ -1,15 +1,18 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import {
-  IsString,
-  IsNotEmpty,
-  MaxLength,
-  IsNumber,
-  Min,
-  Max,
-} from 'class-validator';
+import { IsString, IsNotEmpty, MaxLength, Min } from 'class-validator';
 
 export class CreateProductDto {
+  @ApiProperty({
+    example: 'Очки',
+    description: 'Название',
+    maxLength: 40,
+  })
+  @IsString({ message: 'Должно быть строкой' })
+  @IsNotEmpty({ message: 'Обязательное поле' })
+  @MaxLength(40, { message: 'Не больше 40' })
+  name: string;
+
   @ApiProperty({
     example: 'Nivea',
     description: 'Brand',

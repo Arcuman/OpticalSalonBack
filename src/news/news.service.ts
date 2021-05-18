@@ -21,7 +21,7 @@ export class NewsService {
     });
   }
 
-  async findAll(offset = 0, limit = 10) {
+  async findAll(offset = 0, limit = 50) {
     return await this.newsRepository.findAll({
       limit: Number(limit),
       offset: Number(offset),
@@ -36,24 +36,16 @@ export class NewsService {
     return await this.newsRepository.destroy({ where: { id } });
   }
 
-  async update(id: number, updateNewsDto: UpdateNewsDto) {
+  async update(id: number, updateNewsDto: CreateNewsDto, image: any) {
+    delete updateNewsDto.image;
+    if (image) {
+      updateNewsDto.image = this.fileService.createFile(FileType.IMAGE, image);
+    }
     const [
       numberOfAffectedRows,
       [updatedNews],
     ] = await this.newsRepository.update(
       { ...updateNewsDto },
-      { where: { id }, returning: true },
-    );
-    return { numberOfAffectedRows, updatedNews };
-  }
-
-  async updateImage(id: number, image: any) {
-    const imagePath = this.fileService.createFile(FileType.IMAGE, image);
-    const [
-      numberOfAffectedRows,
-      [updatedNews],
-    ] = await this.newsRepository.update(
-      { image: imagePath },
       { where: { id }, returning: true },
     );
     return { numberOfAffectedRows, updatedNews };

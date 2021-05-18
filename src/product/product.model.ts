@@ -21,6 +21,11 @@ export class Product extends Model<Product, ProductCreationAttrs> {
   })
   id: number;
 
+  @ApiProperty({ example: 'Очки', description: 'Название' })
+  @Length({ min: 0, max: 40 })
+  @Column({ type: DataType.STRING, allowNull: false })
+  name: string;
+
   @ApiProperty({ example: 'обычные', description: 'Брэнд' })
   @Length({ min: 0, max: 40 })
   @Column({ type: DataType.STRING, allowNull: false })

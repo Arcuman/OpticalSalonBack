@@ -1,4 +1,12 @@
-import { Body, Controller, Req, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Req,
+  Get,
+  Post,
+  UseGuards,
+  Delete,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { UsersService } from './users.service';
 import {
@@ -14,6 +22,7 @@ import { RolesGuard } from '../roles/guards/roles.guard';
 import { AddRoleDto } from './dto/add-role.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ConsultationService } from '../salon/consultation/consultation.service';
+import { AddFavoriteNewsDto } from './dto/add-favorite-news-dto';
 
 @ApiTags('Пользователи')
 @ApiSecurity('bearer')
@@ -43,14 +52,43 @@ export class UsersController {
     return this.usersService.addRole(dto);
   }
 
+  @ApiOperation({ summary: 'Добавить в избранное новость' })
+  @ApiResponse({ status: 200 })
+  @Roles(Role.USER)
+  @UseGuards(RolesGuard)
+  @Post('/favorite/news')
+  addFavoriteNews(@Body() dto: AddFavoriteNewsDto, @Req() req: Request) {
+    const user = req.user as { userId: number };
+    return this.usersService.addFavoriteNews(dto, user.userId);
+  }
+
+  @ApiOperation({ summary: 'Удалить из избранного новость' })
+  @ApiResponse({ status: 200 })
+  @Roles(Role.USER)
+  @UseGuards(RolesGuard)
+  @Delete('/favorite/news')
+  deleteFavoriteNews(@Body() dto: AddFavoriteNewsDto, @Req() req: Request) {
+    const user = req.user as { userId: number };
+    return this.usersService.deleteFavoriteNews(dto, user.userId);
+  }
+
+  @ApiOperation({ summary: 'Удалить из избранного новость' })
+  @ApiResponse({ status: 200 })
+  @Roles(Role.USER)
+  @UseGuards(RolesGuard)
+  @Get('/favorite/news')
+  async getFavoritesNews(@Req() req: Request) {
+    const user = req.user as { userId: number };
+    const favoriteNews = await this.usersService.getFavoriteNews(user.userId);
+    return favoriteNews.map((item) => ({ ...item.toJSON(), isFavorite: true }));
+  }
+
   @ApiOperation({ summary: 'Получить все консультации пользователя' })
   @ApiResponse({ status: 200, type: [User] })
   @Roles(Role.USER)
   @UseGuards(RolesGuard)
   @Get('consultations')
   getConsultation(@Req() req: Request) {
-    console.log('here');
-    console.log(req.user);
     const user = req.user as { userId: number };
     return this.consultationService.findConsultationsByUserId(user);
   }

@@ -12,12 +12,17 @@ import { AddRoleDto } from './dto/add-role.dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Role as RoleModel } from '../roles/roles.model';
 import { Role } from '../roles/enums/role.enum';
+import { AddFavoriteNewsDto } from './dto/add-favorite-news-dto';
+import { NewsService } from '../news/news.service';
+import { News } from '../news/news.model';
+import { FavoriteNews } from '../news/favoriteNews.model';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User) private userRepository: typeof User,
     private roleService: RolesService,
+    private newsService: NewsService,
     private sequelize: Sequelize,
   ) {}
 
@@ -63,6 +68,57 @@ export class UsersService {
     }
     throw new HttpException(
       'Пользователь или роль не найдены',
+      HttpStatus.NOT_FOUND,
+    );
+  }
+
+  async addFavoriteNews(dto: AddFavoriteNewsDto, userId: number) {
+    const user = await this.userRepository.findByPk(userId);
+    const news = await this.newsService.findOne(dto.newsId);
+    if (news && user) {
+      const res = await user.$add('favoriteNew', news.id);
+      if (!res) {
+        return 'Already added';
+      }
+      return res;
+    }
+    throw new HttpException(
+      'Пользователь или новость не найдены',
+      HttpStatus.NOT_FOUND,
+    );
+  }
+
+  async deleteFavoriteNews(dto: AddFavoriteNewsDto, userId: number) {
+    const user = await this.userRepository.findByPk(userId);
+    const news = await this.newsService.findOne(dto.newsId);
+    if (news && user) {
+      const res = await user.$remove('favoriteNew', news.id);
+      console.log(res);
+      if (res) {
+        return 'Success delete';
+      }
+      return 'Nothing delete';
+    }
+    throw new HttpException(
+      'Пользователь или новость не найдены',
+      HttpStatus.NOT_FOUND,
+    );
+  }
+
+  async getFavoriteNews(userId: number) {
+    const user = await this.userRepository.findByPk(userId, {
+      include: [
+        {
+          model: News,
+          as: 'favoriteNews',
+        },
+      ],
+    });
+    if (user) {
+      return user.favoriteNews;
+    }
+    throw new HttpException(
+      'Пользователь или новость не найдены',
       HttpStatus.NOT_FOUND,
     );
   }

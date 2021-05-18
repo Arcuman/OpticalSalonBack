@@ -1,17 +1,17 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
   Param,
-  UseInterceptors,
+  Post,
+  Put,
   Query,
+  Req,
   UploadedFile,
   UseGuards,
-  Put,
-  Delete,
-  NotFoundException,
-  Patch,
+  UseInterceptors,
 } from '@nestjs/common';
 import { NewsService } from './news.service';
 import { CreateNewsDto } from './dto/create-news.dto';
@@ -29,14 +29,18 @@ import { RolesGuard } from '../roles/guards/roles.guard';
 import { Roles } from '../roles/decorators/roles.decorator';
 import { Role } from '../roles/enums/role.enum';
 import { News } from './news.model';
-import { UpdateNewsDto } from './dto/update-news.dto';
-import { UpdateNewsImageDto } from './dto/update-news-image.dto';
+import { Request } from 'express';
+import { UsersService } from '../users/users.service';
 
 @ApiTags('Новости')
 @ApiSecurity('bearer')
+@UseGuards(JwtAuthGuard)
 @Controller('news')
 export class NewsController {
-  constructor(private readonly newsService: NewsService) {}
+  constructor(
+    private readonly newsService: NewsService,
+    private readonly userService: UsersService,
+  ) {}
 
   @ApiResponse({ status: 201, type: News })
   @UseInterceptors(FileInterceptor('image'))
@@ -57,8 +61,21 @@ export class NewsController {
   @ApiResponse({ status: 200, type: [News] })
   @ApiQuery({ name: 'limit', type: 'Number', required: false })
   @ApiQuery({ name: 'offset', type: 'Number', required: false })
-  findAll(@Query('limit') limit?: number, @Query('offset') offset?: number) {
-    return this.newsService.findAll(offset, limit);
+  async findAll(
+    @Req() req: Request,
+    @Query('limit') limit?: number,
+    @Query('offset') offset?: number,
+  ) {
+    const user = req.user as { userId: number };
+    const news = await this.newsService.findAll(offset, limit);
+    const favorite = await this.userService.getFavoriteNews(user.userId);
+    return news.map((oneNews) => {
+      let isFavorite = false;
+      if (favorite.some((favorite) => favorite.id === oneNews.id)) {
+        isFavorite = true;
+      }
+      return { ...oneNews.toJSON(), isFavorite };
+    });
   }
 
   @ApiResponse({ status: 200, type: News })
@@ -67,42 +84,27 @@ export class NewsController {
     return this.newsService.findOne(+id);
   }
 
-  @ApiResponse({ status: 200, type: News })
-  @ApiBody({
-    description: 'Обновить главную информацию',
-    type: UpdateNewsDto,
-  })
-  @Roles(Role.ADMIN)
-  @UseGuards(RolesGuard)
-  @UseGuards(JwtAuthGuard)
-  @Put(':id')
-  async update(@Param('id') id: string, @Body() updateNewsDto: UpdateNewsDto) {
-    const { numberOfAffectedRows, updatedNews } = await this.newsService.update(
-      +id,
-      updateNewsDto,
-    );
-    if (numberOfAffectedRows === 0) {
-      throw new NotFoundException('Такой новости не существует');
-    }
-    return updatedNews;
-  }
-
   @ApiResponse({ status: 201, type: News })
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'Add new news',
-    type: UpdateNewsImageDto,
+    type: CreateNewsDto,
   })
   @Roles(Role.ADMIN)
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
-  @Patch(':id')
-  async updateImage(@Param('id') id: string, @UploadedFile() image) {
-    const {
-      numberOfAffectedRows,
-      updatedNews,
-    } = await this.newsService.updateImage(+id, image);
+  @Put(':id')
+  async updateImage(
+    @Param('id') id: string,
+    @UploadedFile() image,
+    @Body() createNewsDto: CreateNewsDto,
+  ) {
+    const { numberOfAffectedRows, updatedNews } = await this.newsService.update(
+      +id,
+      createNewsDto,
+      image,
+    );
     if (numberOfAffectedRows === 0) {
       throw new NotFoundException('Такой новости не существует');
     }
