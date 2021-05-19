@@ -69,13 +69,15 @@ export class NewsController {
     const user = req.user as { userId: number };
     const news = await this.newsService.findAll(offset, limit);
     const favorite = await this.userService.getFavoriteNews(user.userId);
-    return news.map((oneNews) => {
-      let isFavorite = false;
-      if (favorite.some((favorite) => favorite.id === oneNews.id)) {
-        isFavorite = true;
-      }
-      return { ...oneNews.toJSON(), isFavorite };
-    });
+    return news
+      .map((oneNews) => {
+        let isFavorite = false;
+        if (favorite.some((favorite) => favorite.id === oneNews.id)) {
+          isFavorite = true;
+        }
+        return { ...oneNews.toJSON(), isFavorite };
+      })
+      .sort((a: any, b: any) => b.id - a.id);
   }
 
   @ApiResponse({ status: 200, type: News })
