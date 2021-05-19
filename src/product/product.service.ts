@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './product.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { FilesService, FileType } from '../files/files.service';
-import { CreateNewsDto } from '../news/dto/create-news.dto';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class ProductService {
@@ -24,10 +23,16 @@ export class ProductService {
     });
   }
 
-  async findAll(offset = 0, limit = 10) {
+  async findAll(name = '', offset = 0, limit = 10, price = 99999999999) {
     return await this.productRepository.findAll({
       limit: Number(limit),
       offset: Number(offset),
+      where: {
+        [Op.and]: {
+          name: { [Op.like]: `%${name}%` },
+          cost: { [Op.lt]: price },
+        },
+      },
     });
   }
 

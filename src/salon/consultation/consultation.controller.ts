@@ -46,10 +46,7 @@ export class ConsultationController {
     @Req() req: Request,
   ) {
     const user = req.user as { userId: number };
-    return this.consultationService.create({
-      ...createConsultationDto,
-      userId: user.userId,
-    });
+    return this.consultationService.create(createConsultationDto, user.userId);
   }
 
   @Roles(Role.ADMIN)

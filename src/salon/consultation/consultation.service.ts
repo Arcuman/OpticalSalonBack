@@ -14,9 +14,11 @@ export class ConsultationService {
 
   async create(
     createConsultationDto: CreateConsultationDto,
+    userId,
   ): Promise<Consultation> {
     return await this.consultationRepository.create({
       ...createConsultationDto,
+      userId,
     });
   }
 

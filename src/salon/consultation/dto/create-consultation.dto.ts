@@ -22,14 +22,6 @@ export class CreateConsultationDto {
 
   @ApiProperty({
     example: 1,
-    description: 'Индентификатор пользователя',
-  })
-  @IsNumber({}, { message: 'Должно быть числом' })
-  @IsNotEmpty({ message: 'Обязательное поле' })
-  userId: number;
-
-  @ApiProperty({
-    example: 1,
     description: 'Индентификатор салона',
   })
   @IsNumber({}, { message: 'Должно быть числом' })

@@ -59,15 +59,17 @@ export class NewsController {
 
   @Get()
   @ApiResponse({ status: 200, type: [News] })
+  @ApiQuery({ name: 'name', type: 'String', required: false })
   @ApiQuery({ name: 'limit', type: 'Number', required: false })
   @ApiQuery({ name: 'offset', type: 'Number', required: false })
   async findAll(
     @Req() req: Request,
+    @Query('name') name?: string,
     @Query('limit') limit?: number,
     @Query('offset') offset?: number,
   ) {
     const user = req.user as { userId: number };
-    const news = await this.newsService.findAll(offset, limit);
+    const news = await this.newsService.findAll(name, offset, limit);
     const favorite = await this.userService.getFavoriteNews(user.userId);
     return news
       .map((oneNews) => {

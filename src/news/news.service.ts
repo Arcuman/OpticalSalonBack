@@ -3,6 +3,7 @@ import { CreateNewsDto } from './dto/create-news.dto';
 import { News } from './news.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { FilesService, FileType } from '../files/files.service';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class NewsService {
@@ -20,10 +21,11 @@ export class NewsService {
     });
   }
 
-  async findAll(offset = 0, limit = 50) {
+  async findAll(name = '', offset = 0, limit = 50) {
     return await this.newsRepository.findAll({
       limit: Number(limit),
       offset: Number(offset),
+      where: { title: { [Op.like]: `%${name}%` } },
     });
   }
 

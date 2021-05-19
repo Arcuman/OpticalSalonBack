@@ -18,6 +18,7 @@ import { News } from '../news/news.model';
 import { AddFavoriteProductsDto } from './dto/add-favorite-products-dto';
 import { ProductService } from '../product/product.service';
 import { Product } from '../product/product.model';
+import { Consultation } from '../salon/consultation/consultation.model';
 
 @Injectable()
 export class UsersService {
@@ -54,6 +55,11 @@ export class UsersService {
   async getUserById(id: number) {
     return await this.userRepository.findByPk(id, {
       attributes: ['id', 'email', 'phone', 'name'],
+      include: [
+        {
+          model: Consultation,
+        },
+      ],
     });
   }
 

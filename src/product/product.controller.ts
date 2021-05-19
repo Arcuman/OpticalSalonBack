@@ -59,15 +59,19 @@ export class ProductController {
 
   @Get()
   @ApiResponse({ status: 200, type: [Product] })
+  @ApiQuery({ name: 'name', type: 'String', required: false })
+  @ApiQuery({ name: 'price', type: 'Number', required: false })
   @ApiQuery({ name: 'limit', type: 'Number', required: false })
   @ApiQuery({ name: 'offset', type: 'Number', required: false })
   async findAll(
     @Req() req: Request,
+    @Query('name') name?: string,
+    @Query('price') price?: number,
     @Query('limit') limit?: number,
     @Query('offset') offset?: number,
   ) {
     const user = req.user as { userId: number };
-    const news = await this.productService.findAll(offset, limit);
+    const news = await this.productService.findAll(name, offset, limit, price);
     const favorite = await this.usersService.getFavoriteProduct(user.userId);
     return news
       .map((oneNews) => {
