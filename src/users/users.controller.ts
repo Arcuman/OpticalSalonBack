@@ -23,6 +23,7 @@ import { AddRoleDto } from './dto/add-role.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ConsultationService } from '../salon/consultation/consultation.service';
 import { AddFavoriteNewsDto } from './dto/add-favorite-news-dto';
+import { AddFavoriteProductsDto } from './dto/add-favorite-products-dto';
 
 @ApiTags('Пользователи')
 @ApiSecurity('bearer')
@@ -90,6 +91,45 @@ export class UsersController {
     const user = req.user as { userId: number };
     const favoriteNews = await this.usersService.getFavoriteNews(user.userId);
     return favoriteNews.map((item) => ({ ...item.toJSON(), isFavorite: true }));
+  }
+
+  @ApiOperation({ summary: 'Добавить в избранное продукт' })
+  @ApiResponse({ status: 200 })
+  @Roles(Role.USER)
+  @UseGuards(RolesGuard)
+  @Post('/favorite/products')
+  addFavoriteProduct(@Body() dto: AddFavoriteProductsDto, @Req() req: Request) {
+    const user = req.user as { userId: number };
+    return this.usersService.addFavoriteProduct(dto, user.userId);
+  }
+
+  @ApiOperation({ summary: 'Удалить из избранного продукт' })
+  @ApiResponse({ status: 200 })
+  @Roles(Role.USER)
+  @UseGuards(RolesGuard)
+  @Delete('/favorite/products')
+  deleteFavoriteProduct(
+    @Body() dto: AddFavoriteProductsDto,
+    @Req() req: Request,
+  ) {
+    const user = req.user as { userId: number };
+    return this.usersService.deleteFavoriteProduct(dto, user.userId);
+  }
+
+  @ApiOperation({ summary: 'Удалить из избранного продукт' })
+  @ApiResponse({ status: 200 })
+  @Roles(Role.USER)
+  @UseGuards(RolesGuard)
+  @Get('/favorite/products')
+  async getFavoritesProduct(@Req() req: Request) {
+    const user = req.user as { userId: number };
+    const favoriteProduct = await this.usersService.getFavoriteProduct(
+      user.userId,
+    );
+    return favoriteProduct.map((item) => ({
+      ...item.toJSON(),
+      isFavorite: true,
+    }));
   }
 
   @ApiOperation({ summary: 'Получить все консультации пользователя' })

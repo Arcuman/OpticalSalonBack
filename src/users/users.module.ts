@@ -13,6 +13,8 @@ import { ConsultationModule } from '../salon/consultation/consultation.module';
 import { News } from '../news/news.model';
 import { FavoriteNews } from '../news/favoriteNews.model';
 import { NewsModule } from '../news/news.module';
+import { FavoriteProducts } from '../product/favoriteProducts.model';
+import { ProductModule } from '../product/product.module';
 
 @Module({
   controllers: [UsersController],
@@ -25,9 +27,11 @@ import { NewsModule } from '../news/news.module';
       Consultation,
       News,
       FavoriteNews,
+      FavoriteProducts,
     ]),
     RolesModule,
     NewsModule,
+    ProductModule,
     ConsultationModule,
     forwardRef(() => AuthModule),
   ],

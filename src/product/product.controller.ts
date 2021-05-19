@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseInterceptors,
@@ -12,6 +11,7 @@ import {
   Query,
   Put,
   NotFoundException,
+  Req,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -29,14 +29,18 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { RolesGuard } from '../roles/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Product } from './product.model';
-import { News } from '../news/news.model';
-import { CreateNewsDto } from '../news/dto/create-news.dto';
+import { Request } from 'express';
+import { UsersService } from '../users/users.service';
 
 @ApiTags('Продукты')
 @ApiSecurity('bearer')
+@UseGuards(JwtAuthGuard)
 @Controller('products')
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  constructor(
+    private readonly productService: ProductService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @Roles(Role.ADMIN)
   @ApiResponse({ status: 200, type: Product })
@@ -57,8 +61,23 @@ export class ProductController {
   @ApiResponse({ status: 200, type: [Product] })
   @ApiQuery({ name: 'limit', type: 'Number', required: false })
   @ApiQuery({ name: 'offset', type: 'Number', required: false })
-  findAll(@Query('limit') limit?: number, @Query('offset') offset?: number) {
-    return this.productService.findAll(offset, limit);
+  async findAll(
+    @Req() req: Request,
+    @Query('limit') limit?: number,
+    @Query('offset') offset?: number,
+  ) {
+    const user = req.user as { userId: number };
+    const news = await this.productService.findAll(offset, limit);
+    const favorite = await this.usersService.getFavoriteProduct(user.userId);
+    return news
+      .map((oneNews) => {
+        let isFavorite = false;
+        if (favorite.some((favorite) => favorite.id === oneNews.id)) {
+          isFavorite = true;
+        }
+        return { ...oneNews.toJSON(), isFavorite };
+      })
+      .sort((a: any, b: any) => b.id - a.id);
   }
 
   @ApiResponse({ status: 200, type: Product })

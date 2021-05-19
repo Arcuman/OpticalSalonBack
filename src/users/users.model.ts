@@ -12,6 +12,8 @@ import { UserRoles } from '../roles/user-roles.model';
 import { Consultation } from '../salon/consultation/consultation.model';
 import { FavoriteNews } from '../news/favoriteNews.model';
 import { News } from '../news/news.model';
+import { Product } from '../product/product.model';
+import { FavoriteProducts } from '../product/favoriteProducts.model';
 
 interface UserCreationAttrs {
   email: string;
@@ -50,6 +52,9 @@ export class User extends Model<User, UserCreationAttrs> {
 
   @BelongsToMany(() => News, () => FavoriteNews)
   favoriteNews: News[];
+
+  @BelongsToMany(() => Product, () => FavoriteProducts)
+  favoriteProducts: Product[];
 
   @HasMany(() => Consultation)
   consultations: Consultation[];

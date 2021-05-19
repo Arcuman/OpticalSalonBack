@@ -19,6 +19,7 @@ import { Salon } from './salon/salon.model';
 import { ConsultationModule } from './salon/consultation/consultation.module';
 import { Consultation } from './salon/consultation/consultation.model';
 import { FavoriteNews } from './news/favoriteNews.model';
+import { FavoriteProducts } from './product/favoriteProducts.model';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { FavoriteNews } from './news/favoriteNews.model';
         Salon,
         Consultation,
         FavoriteNews,
+        FavoriteProducts,
       ],
     }),
     UsersModule,

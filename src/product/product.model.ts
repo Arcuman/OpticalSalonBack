@@ -1,5 +1,15 @@
-import { Column, DataType, Length, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsToMany,
+  Column,
+  DataType,
+  Length,
+  Model,
+  Table,
+} from 'sequelize-typescript';
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from '../users/users.model';
+import { FavoriteNews } from '../news/favoriteNews.model';
+import { FavoriteProducts } from './favoriteProducts.model';
 
 interface ProductCreationAttrs {
   brand: string;
@@ -61,4 +71,7 @@ export class Product extends Model<Product, ProductCreationAttrs> {
   })
   @Column({ type: DataType.STRING, allowNull: false })
   photo: string;
+
+  @BelongsToMany(() => User, () => FavoriteProducts)
+  users: User[];
 }

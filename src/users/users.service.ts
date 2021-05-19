@@ -15,7 +15,9 @@ import { Role } from '../roles/enums/role.enum';
 import { AddFavoriteNewsDto } from './dto/add-favorite-news-dto';
 import { NewsService } from '../news/news.service';
 import { News } from '../news/news.model';
-import { FavoriteNews } from '../news/favoriteNews.model';
+import { AddFavoriteProductsDto } from './dto/add-favorite-products-dto';
+import { ProductService } from '../product/product.service';
+import { Product } from '../product/product.model';
 
 @Injectable()
 export class UsersService {
@@ -23,6 +25,7 @@ export class UsersService {
     @InjectModel(User) private userRepository: typeof User,
     private roleService: RolesService,
     private newsService: NewsService,
+    private productsService: ProductService,
     private sequelize: Sequelize,
   ) {}
 
@@ -125,6 +128,57 @@ export class UsersService {
     }
     throw new HttpException(
       'Пользователь или новость не найдены',
+      HttpStatus.NOT_FOUND,
+    );
+  }
+
+  async addFavoriteProduct(dto: AddFavoriteProductsDto, userId: number) {
+    const user = await this.userRepository.findByPk(userId);
+    const products = await this.productsService.findOne(dto.productId);
+    if (products && user) {
+      const res = await user.$add('favoriteProducts', products.id);
+      if (!res) {
+        return 'Уже в избранном';
+      }
+      return res;
+    }
+    throw new HttpException(
+      'Пользователь или продукт не найдены',
+      HttpStatus.NOT_FOUND,
+    );
+  }
+
+  async deleteFavoriteProduct(dto: AddFavoriteProductsDto, userId: number) {
+    const user = await this.userRepository.findByPk(userId);
+    const product = await this.productsService.findOne(dto.productId);
+    if (product && user) {
+      const res = await user.$remove('favoriteProducts', product.id);
+      console.log(res);
+      if (res) {
+        return 'Успешно удалено';
+      }
+      return 'Нечего удалять';
+    }
+    throw new HttpException(
+      'Пользователь или новость не найдены',
+      HttpStatus.NOT_FOUND,
+    );
+  }
+
+  async getFavoriteProduct(userId: number) {
+    const user = await this.userRepository.findByPk(userId, {
+      include: [
+        {
+          model: Product,
+          as: 'favoriteProducts',
+        },
+      ],
+    });
+    if (user) {
+      return user.favoriteProducts;
+    }
+    throw new HttpException(
+      'Пользователь или продукт не найдены',
       HttpStatus.NOT_FOUND,
     );
   }
