@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import * as bcrypt from 'bcryptjs';
 import { User } from '../users/users.model';
+import { Role } from '../roles/enums/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +28,7 @@ export class AuthService {
       roles: user.roles.map((role) => role.value),
     };
     return {
+      isAdmin: user.roles.some((role) => role.value === Role.ADMIN),
       access_token: this.jwtService.sign(payload),
     };
   }
@@ -50,6 +52,7 @@ export class AuthService {
       roles: user.roles.map((role) => role.value),
     };
     return {
+      isAdmin: user.roles.some((role) => role.value === Role.ADMIN),
       access_token: this.jwtService.sign(payload),
     };
   }
