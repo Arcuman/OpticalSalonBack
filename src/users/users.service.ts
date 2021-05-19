@@ -48,6 +48,12 @@ export class UsersService {
     });
   }
 
+  async getUserById(id: number) {
+    return await this.userRepository.findByPk(id, {
+      attributes: ['id', 'email', 'phone', 'name'],
+    });
+  }
+
   async getUserByEmail(email: string) {
     return await this.userRepository.findOne({
       where: { email },

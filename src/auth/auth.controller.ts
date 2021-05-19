@@ -12,14 +12,20 @@ import { News } from '../news/news.model';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiResponse({ status: 200, description: 'Return access token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return access token with isAdmin boolean value',
+  })
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   async login(@Body() userDto: LoginRequestDto, @Request() req) {
     return this.authService.login(req.user);
   }
 
-  @ApiResponse({ status: 200, description: 'Return access token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Return access token with isAdmin boolean value',
+  })
   @Post('/registration')
   registration(@Body() userDto: CreateUserDto) {
     return this.authService.registration(userDto);

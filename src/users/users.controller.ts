@@ -43,6 +43,15 @@ export class UsersController {
     return this.usersService.getAllUsers();
   }
 
+  @ApiOperation({ summary: 'Получить информацию о профиле' })
+  @ApiResponse({ status: 200, type: [User] })
+  @UseGuards(RolesGuard)
+  @Get('/profile')
+  async getUserInfo(@Req() req) {
+    const user = await this.usersService.getUserById(req.user.userId);
+    return user.toJSON();
+  }
+
   @ApiOperation({ summary: 'Выдать роль' })
   @ApiResponse({ status: 200 })
   @Roles(Role.USER)
