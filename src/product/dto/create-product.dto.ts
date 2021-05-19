@@ -78,6 +78,6 @@ export class CreateProductDto {
   @MaxLength(40, { message: 'Не больше 40' })
   material: string;
 
-  @ApiProperty({ type: 'string', format: 'binary' })
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
   photo: any;
 }

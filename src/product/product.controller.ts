@@ -10,6 +10,8 @@ import {
   UseGuards,
   UploadedFile,
   Query,
+  Put,
+  NotFoundException,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -27,6 +29,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { RolesGuard } from '../roles/guards/roles.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Product } from './product.model';
+import { News } from '../news/news.model';
+import { CreateNewsDto } from '../news/dto/create-news.dto';
 
 @ApiTags('Продукты')
 @ApiSecurity('bearer')
@@ -63,13 +67,42 @@ export class ProductController {
     return this.productService.findOne(+id);
   }
 
-  /*@Patch(':id')
-  update(@Param('id') id: string, @Body() updateNewsDto: UpdateNewsDto) {
-    return this.productService.update(+id, updateNewsDto);
+  @ApiResponse({ status: 200, type: Product })
+  @UseInterceptors(FileInterceptor('photo'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Add new news',
+    type: CreateProductDto,
+  })
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @UploadedFile() photo,
+    @Body() createNewsDto: CreateProductDto,
+  ) {
+    const {
+      numberOfAffectedRows,
+      updatedProducts,
+    } = await this.productService.update(+id, createNewsDto, photo);
+    if (numberOfAffectedRows === 0) {
+      throw new NotFoundException('Такого продукта не существует');
+    }
+    return updatedProducts;
   }
 
+  @ApiResponse({ status: 200 })
+  @Roles(Role.ADMIN)
+  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productService.remove(+id);
-  }*/
+  async remove(@Param('id') id: string) {
+    const deleted = await this.productService.delete(id);
+    if (deleted === 0) {
+      throw new NotFoundException('Такого продукта не существует');
+    }
+    return 'Successfully deleted';
+  }
 }

@@ -4,6 +4,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './product.model';
 import { InjectModel } from '@nestjs/sequelize';
 import { FilesService, FileType } from '../files/files.service';
+import { CreateNewsDto } from '../news/dto/create-news.dto';
 
 @Injectable()
 export class ProductService {
@@ -34,11 +35,25 @@ export class ProductService {
     return await this.productRepository.findByPk(id);
   }
 
-  async update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  async update(id: number, updateProductDto: CreateProductDto, image: any) {
+    delete updateProductDto.photo;
+    if (image) {
+      updateProductDto.photo = this.fileService.createFile(
+        FileType.IMAGE,
+        image,
+      );
+    }
+    const [
+      numberOfAffectedRows,
+      [updatedProducts],
+    ] = await this.productRepository.update(
+      { ...updateProductDto },
+      { where: { id }, returning: true },
+    );
+    return { numberOfAffectedRows, updatedProducts };
   }
 
-  async remove(id: number) {
-    return `This action removes a #${id} product`;
+  async delete(id) {
+    return await this.productRepository.destroy({ where: { id } });
   }
 }
