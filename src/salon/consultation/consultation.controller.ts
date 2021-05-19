@@ -8,6 +8,7 @@ import {
   UseGuards,
   UploadedFile,
   Query,
+  Req,
 } from '@nestjs/common';
 import { ConsultationService } from './consultation.service';
 import { CreateConsultationDto } from './dto/create-consultation.dto';
@@ -23,6 +24,7 @@ import { Role } from '../../roles/enums/role.enum';
 import { RolesGuard } from '../../roles/guards/roles.guard';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { Consultation } from './consultation.model';
+import { Request } from 'express';
 
 @ApiTags('Консультации')
 @ApiSecurity('bearer')
@@ -39,8 +41,15 @@ export class ConsultationController {
   @UseGuards(RolesGuard)
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createConsultationDto: CreateConsultationDto) {
-    return this.consultationService.create(createConsultationDto);
+  create(
+    @Body() createConsultationDto: CreateConsultationDto,
+    @Req() req: Request,
+  ) {
+    const user = req.user as { userId: number };
+    return this.consultationService.create({
+      ...createConsultationDto,
+      userId: user.userId,
+    });
   }
 
   @Roles(Role.ADMIN)
@@ -59,7 +68,7 @@ export class ConsultationController {
   @UseGuards(JwtAuthGuard)
   @ApiResponse({ status: 200, type: Consultation })
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param() id: number) {
     return this.consultationService.findOne(+id);
   }
 
